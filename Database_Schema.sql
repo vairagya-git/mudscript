@@ -1,9 +1,39 @@
-CREATE TABLE `earnings_upcoming` (
+CREATE TABLE `earnings_upcoming_dates` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `stock_id` bigint unsigned NOT NULL,
   `ticker` varchar(255) DEFAULT NULL,
-  `earnings_date` varchar(255) DEFAULT NULL,
+  `earnings_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT unique_earnings_upcoming UNIQUE (`ticker`,`earnings_date`)
+  KEY `fk_earnings_upcoming_dates` (`stock_id`),
+  CONSTRAINT `fk_earnings_upcoming_dates` FOREIGN KEY (`stock_id`) REFERENCES `stock` (`id`),
+  CONSTRAINT unique_earnings_upcoming UNIQUE (`ticker`,`stock_id`, `earnings_date`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `earnings_data` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `stock_id` bigint unsigned NOT NULL,
+  `ticker` varchar(255) DEFAULT NULL,
+  `earnings_date` date DEFAULT NULL,
+  `stockPriceSOD` decimal(20,2) DEFAULT NULL,
+  `stockPriceEOD` decimal(20,2) DEFAULT NULL,
+  `stockPriceEO2Ds` decimal(20,2) DEFAULT NULL,
+  `stockPriceEOW` decimal(20,2) DEFAULT NULL,
+  `stockPriceEO2Ws` decimal(20,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_earnings_data` (`stock_id`),
+  CONSTRAINT `fk_earnings_data` FOREIGN KEY (`stock_id`) REFERENCES `stock` (`id`),
+  CONSTRAINT unique_earnings_upcoming UNIQUE (`ticker`,`stock_id`, `earnings_date`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `split_data` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `stock_id` bigint unsigned NOT NULL,
+  `ticker` varchar(255) DEFAULT NULL,
+  `earnings_date` date DEFAULT NULL,
+  `priceBeforeSplit` decimal(20,2) DEFAULT NULL,
+  `priceAfterSplit` decimal(20,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT unique_earnings_upcoming UNIQUE (`ticker`, `stock_id`, `earnings_date`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `filing_13f` (
@@ -173,12 +203,36 @@ CREATE TABLE `upload_watchlist_stock` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
-CREATE TABLE `upload_earnings_upcoming` (
+CREATE TABLE `upload_earnings_upcoming_date` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `ticker` varchar(255) DEFAULT NULL,
   `earnings_date` date DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
+
+CREATE TABLE `upload_earnings_data` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ticker` varchar(255) DEFAULT NULL,
+  `earnings_date` date DEFAULT NULL,
+  `stockPriceSOD` decimal(20,2) DEFAULT NULL,
+  `stockPriceEOD` decimal(20,2) DEFAULT NULL,
+  `stockPriceEO2Ds` decimal(20,2) DEFAULT NULL,
+  `stockPriceEOW` decimal(20,2) DEFAULT NULL,
+  `stockPriceEO2Ws` decimal(20,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT unique_earnings_upcoming UNIQUE (`ticker`,`earnings_date`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `upload_split_data` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ticker` varchar(255) DEFAULT NULL,
+  `earnings_date` date DEFAULT NULL,
+  `priceBeforeSplit` decimal(20,2) DEFAULT NULL,
+  `priceAfterSplit` decimal(20,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT unique_earnings_upcoming UNIQUE (`ticker`,`earnings_date`)
+) ENGINE=InnoDB;
+
 
 CREATE TABLE `upload_13f_stock_data` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,

@@ -60,12 +60,12 @@ WHERE uws.watchlist IS NOT NULL
 
 /*** *** *** *** *** *** *** *** *** *** *** ***/
 /* 
-Upload upcoming earning data
+Upload upcoming earning date
 upload_earnings_upcoming
 */
   
 LOAD DATA LOCAL INFILE '//Users/rama/Library/Mobile Documents/com~apple~CloudDocs/Mud/data/stock_upcoming_earnings.csv'
-INTO TABLE upload_earnings_upcoming
+INTO TABLE upload_earnings_upcoming_date
 CHARACTER SET utf8mb4
 FIELDS
   TERMINATED BY ';'
@@ -79,11 +79,64 @@ SET
   earnings_date     = NULLIF(@earningsDate, '');
 
 /* Insert into fund_manager with cik value */
-INSERT IGNORE INTO mud.earnings_upcoming (ticker, earnings_date)
-SELECT DISTINCT  ticker, earnings_date
-FROM mud.upload_earnings_upcoming
-WHERE ticker IS NOT NULL
-  AND earnings_date IS NOT NULL;
+INSERT IGNORE INTO mud.earnings_upcoming_dates (ticker, earnings_date, stock_id)
+SELECT DISTINCT  ueud.ticker, ueud.earnings_date, s.id
+FROM mud.upload_earnings_upcoming_date ueud
+JOIN mud.stock s ON s.ticker = trim(ueud.ticker)
+WHERE ueud.ticker IS NOT NULL
+  AND ueud.earnings_date IS NOT NULL;
+
+/*** *** *** *** *** *** *** *** *** *** *** ***/
+
+
+/*** *** *** *** *** *** *** *** *** *** *** ***/
+/* 
+Upload past earning data & price reflection.
+upload_earnings_data
+*/
+  
+LOAD DATA LOCAL INFILE '//Users/rama/Library/Mobile Documents/com~apple~CloudDocs/Mud/data/stock_earnings_history.csv'
+INTO TABLE upload_earnings_data
+CHARACTER SET utf8mb4
+FIELDS
+  TERMINATED BY ';'
+  OPTIONALLY ENCLOSED BY '"'
+LINES
+  TERMINATED BY '\n'
+IGNORE 1 LINES
+(@ticker, @earningsDate, @stockPriceSOD, @stockPriceEOD, @stockPriceEO2Ds, @stockPriceEOW, @stockPriceEO2Ws)
+SET
+  ticker     = NULLIF(@ticker, ''),
+  earnings_date     =  STR_TO_DATE(@earningsDate, '%d-%b-%Y'), 
+  stockPriceSOD      = CASE
+                  WHEN NULLIF(@stockPriceSOD, '') IS NULL THEN NULL
+                  ELSE CAST(REPLACE(@stockPriceSOD, ',', '')  AS DECIMAL(20,2))
+                END,
+  stockPriceEOD      = CASE
+                  WHEN NULLIF(@stockPriceEOD, '') IS NULL THEN NULL
+                  ELSE CAST(REPLACE(@stockPriceEOD, ',', '')  AS DECIMAL(20,2))
+                END,
+  stockPriceEO2Ds      = CASE
+                  WHEN NULLIF(@stockPriceEO2Ds, '') IS NULL THEN NULL
+                  ELSE CAST(REPLACE(@stockPriceEO2Ds, ',', '')  AS DECIMAL(20,2))
+                END,
+  stockPriceEOW      = CASE
+                  WHEN NULLIF(@stockPriceEOW, '') IS NULL THEN NULL
+                  ELSE CAST(REPLACE(@stockPriceEOW, ',', '')  AS DECIMAL(20,2))
+                END,
+  stockPriceEO2Ws      = CASE
+                  WHEN NULLIF(@stockPriceEO2Ws, '') IS NULL THEN NULL
+                  ELSE CAST(REPLACE(@stockPriceEO2Ws, ',', '')  AS DECIMAL(20,2))
+                END;
+
+/* Insert earnings data to db earnings_data */
+INSERT IGNORE INTO mud.earnings_data (stock_id, ticker, earnings_date, stockPriceSOD, stockPriceEOD, stockPriceEO2Ds, stockPriceEOW, stockPriceEO2Ws)
+SELECT DISTINCT  s.id, ued.ticker, ued.earnings_date, ued.stockPriceSOD, ued.stockPriceEOD, ued.stockPriceEO2Ds, ued.stockPriceEOW, ued.stockPriceEO2Ws
+FROM mud.upload_earnings_data ued
+JOIN mud.stock s ON s.ticker = trim(ued.ticker)
+WHERE ued.ticker IS NOT NULL
+  AND ued.earnings_date IS NOT NULL;
+
 /*** *** *** *** *** *** *** *** *** *** *** ***/
 
 
