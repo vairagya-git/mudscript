@@ -1,0 +1,7 @@
+ticker;seqNo;newsDate;code;detail
+KLAC;0;15-jan-2026;PRICE_MOVEMENT;"Shares jumped 8.3% after analyst upgrade"
+KLAC,ASML,AMAT,LRCX,TSM;0;15-jan-2026;MARKET_NEWS;"Strong earnings boosted semiconductor demand outlook"
+KLAC;0;15-jan-2026;MARKET_NEWS;"Opened new R&D and innovation hub in Chennai"
+KLAC;0;16-jan-2026;PRICE_MOVEMENT;"Stock up 21.6% YTD, hit new 52-week high"
+NOSTOCK;1;8-Jan-2026;GENERAL;"Tech Stock gets sold off, if the interest rate increases"
+NOSTOCK;2;8-Jan-2026;GENERAL;"ZOOX a autonomous vehicle company is not public traded but owned by amazon"
